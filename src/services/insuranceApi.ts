@@ -1,11 +1,7 @@
 import type { TokenResponse, ContractResponse } from '../types/insurance';
 
-// En desarrollo usa el proxy de Vite, en producción usa la URL directa
-const API_BASE_URL = import.meta.env.DEV
-  ? '/api/proassis'
-  : 'https://proassisapp.com/proassislife/servicios';
-
-const AUTH_TOKEN = 'QlUxdUxpTmZmbkEyV0tzMUphTVRRdy4uOmFBcEQwb3RrVS1vUzRYd21NQURRUHcuLg==';
+// En desarrollo usa el proxy de Vite, en producción usa las serverless functions
+const isDev = import.meta.env.DEV;
 
 let cachedToken: string | null = null;
 let tokenExpiry: number | null = null;
@@ -18,15 +14,15 @@ export async function fetchAccessToken(): Promise<string | null> {
   }
 
   console.log('🔑 Solicitando nuevo token...');
+
   try {
-    const response = await fetch(`${API_BASE_URL}/oauth/token`, {
+    const url = isDev ? '/api/proassis/oauth/token' : '/api/token';
+
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
-        'Cache-Control': 'no-cache',
-        'Authorization': `Basic ${AUTH_TOKEN}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json',
       },
-      body: 'grant_type=client_credentials',
     });
 
     console.log('📡 Respuesta token:', response.status, response.statusText);
@@ -56,7 +52,10 @@ export async function fetchContractInfo(cedula: string, token: string): Promise<
   console.log('🔍 Consultando contrato para cédula:', cedula);
 
   try {
-    const url = `${API_BASE_URL}/cuxibamba/obtenerContratoCoberturaV2/${cedula}`;
+    const url = isDev
+      ? `/api/proassis/cuxibamba/obtenerContratoCoberturaV2/${cedula}`
+      : `/api/contract?cedula=${cedula}`;
+
     console.log('📍 URL:', url);
 
     const response = await fetch(url, {
