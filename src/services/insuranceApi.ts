@@ -21,8 +21,11 @@ export async function fetchAccessToken(): Promise<string | null> {
     const response = await fetch(url, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache',
+        'Authorization': `Basic ${import.meta.env.VITE_OAUTH_BASIC_TOKEN}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
+      body: 'grant_type=client_credentials',
     });
 
     console.log('📡 Respuesta token:', response.status, response.statusText);
