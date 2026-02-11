@@ -5,6 +5,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
+    host: "192.168.0.10",        
+    port: 7151,
     proxy: {
       '/api/proassis': {
         target: 'https://proassisapp.com',
